@@ -1,0 +1,4 @@
+# IDE-based ignored files
+/.idea/
+# Datasource local storage ignored files
+/data/
