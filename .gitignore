@@ -1,5 +1,4 @@
 # IDE-based ignored files
 /.idea/
 # Data storage ignored files
-/data/
-/clean_datasets/
+solution/data/
