@@ -1,6 +1,6 @@
-package com.example.spring_boot_server.genres;
+package com.tweb.movies.movie_service.genres;
 
-import com.example.spring_boot_server.movies.Movie;
+import com.tweb.movies.movie_service.movies.Movie;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 

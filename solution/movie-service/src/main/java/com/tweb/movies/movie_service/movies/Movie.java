@@ -1,5 +1,13 @@
-package com.tweb.movies.movie_service.movie;
-import jakarta.persistance.*;
+package com.tweb.movies.movie_service.movies;
+
+import com.tweb.movies.movie_service.actors.Actor;
+import com.tweb.movies.movie_service.crew.Crew;
+import com.tweb.movies.movie_service.genres.Genre;
+import com.tweb.movies.movie_service.languages.Language;
+import com.tweb.movies.movie_service.posters.Poster;
+import com.tweb.movies.movie_service.releases.Release;
+import com.tweb.movies.movie_service.studios.Studios;
+import com.tweb.movies.movie_service.themes.Theme;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
@@ -29,7 +37,7 @@ public class Movie {
     private Integer minute;
 
     @Column(name = "rating")
-    private Double rating; // Numeric(3,2) maps well to Double for movies
+    private Double rating;
 
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference

@@ -1,8 +1,8 @@
-package com.example.spring_boot_server.countries;
+package com.tweb.movies.movie_service.countries;
 
 import jakarta.persistence.*;
 
-import com.example.spring_boot_server.movies.Movie;
+import com.tweb.movies.movie_service.movies.Movie;
 
 @Entity
 @Table(name = "countries")
@@ -12,27 +12,26 @@ public class Country {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "country", nullable = false)
+    @Column(name = "movie_id", nullable = false, columnDefinition = "BIGINT")
+    private Integer movie_id;
+
+    @Column(name = "country", nullable = false, columnDefinition = "TEXT")
     private String country;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "movie_id")
-    @JsonBackReference
-    private Movie movie;
 
     public Country() {}
 
-    public Country(String name, Movie movie) {
-        this.name = name;
-        this.movie = movie;
+    public Country(Integer movie_id, String country) {
+        this.movie_id = movie_id;
+        this.country = country;
     }
 
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    public Integer getMovie_film() {return movie_id;}
+    public void setMovie_film(Integer movie_id) {this.movie_id = movie_id;}
 
-    public Movie getMovie() { return movie; }
-    public void setMovie(Movie movie) { this.movie = movie; }
+    public String getCountry() {return country;}
+    public void setCountry(String country) {this.country = country;}
 }
