@@ -133,6 +133,25 @@ function toggleCrew(btn) {
     }
 }
 
+function toggleChat() {
+    const chatWindow = document.getElementById('chat-window');
+    const fab = document.getElementById('chat-fab');
+
+    if (chatWindow.classList.contains('d-none')) {
+        chatWindow.classList.remove('d-none');
+        chatWindow.classList.add('d-flex');
+
+        fab.style.transform = "rotate(45deg)";
+        fab.innerHTML = "✕";
+    } else {
+        chatWindow.classList.add('d-none');
+        chatWindow.classList.remove('d-flex');
+
+        fab.style.transform = "rotate(0deg)";
+        fab.innerHTML = "💬";
+    }
+}
+
 function renderMovies(movieList, shouldAppend = false) {
     const grid = document.getElementById('movie-grid');
     if (!shouldAppend) {
@@ -144,13 +163,12 @@ function renderMovies(movieList, shouldAppend = false) {
         col.className = 'col animate-fade-in';
 
         col.innerHTML = `
-            <div class="card movie-card h-100 shadow-sm">
+            <div class="card movie-card h-100 text-white" style="background-color: #1f1f1f; border: none; cursor: pointer;">
                 <img src="${movie.link === 'no_link' ? PLACEHOLDER_IMG : movie.link}"
-                    class="card-img-top" alt="${movie.name}">
-                <div class="card-body d-flex flex-column">
+                    class="movie-poster" alt="${movie.name}">
+                <div class="card-body d-flex flex-column overlay">
                     <h5 class="card-title">${movie.name}</h5>
                     <p class="card-text text-light small">
-                        📅 ${movie.date || 'Unknown'} <br>
                         ⭐ ${movie.rating || 'N/A'}
                     </p>
                 </div>
@@ -173,7 +191,7 @@ async function loadMovieDetails(id) {
 
     const contentDiv = document.getElementById('main-content');
 
-    contentDiv.innerHTML = '<div class="text-center mt-5"><div class="spinner-border"></div><p>Loading data...</p></div>';
+    showSpinner(true);
     contentDiv.style.display = 'block';
     try {
         const movieResponse = await fetch(`/getMovie/${id}`);
@@ -315,25 +333,35 @@ async function loadMovieDetails(id) {
                         </div>
                     </div>
                 </div>
-                
-                <div class="row mt-5 mb-5">
-                    <div class="col-12">
-                        <div class="card shadow">
-                            <div class="card-header text-white" style="background-color: #E50914">
-                                Movie Chat Room - Have fun!
-                            </div>
-                            <div class="card-body">
-                                <div id="chat-box" style="height: 300px; overflow-y: scroll; border: 1px solid #ddd; padding: 10px; margin-bottom: 15px; background-color: #f9f9f9;">
-                                    <div class="text-center text-muted small" >Benvenuto nella chat di ${movie.name}!</div>
-                                </div>
-                
-                                <div class="input-group">
-                                    <input type="text" id="chat-username" class="form-control" placeholder="Il tuo nome..." style="max-width: 150px;">
-                                    <input type="text" id="chat-input" class="form-control" placeholder="Scrivi un messaggio...">
-                                    <button class="btn btn-primary" onclick="sendMessage('${movie.id}')">Invia</button>
-                                </div>
-                            </div>
+
+                <button id="chat-fab" onclick="toggleChat()"
+                    class="btn btn-danger rounded-circle shadow-lg d-flex align-items-center justify-content-center"
+                    style="position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; z-index: 100; font-size: 28px; transition: transform 0.2s;">
+                💬
+                </button>
+
+                <div id="chat-window" class="card shadow-lg d-none animate-fade-in"
+                 style="position: fixed; bottom: 100px; right: 30px; width: 350px; height: 500px; z-index: 9999; border-radius: 15px; border: none; display: flex; flex-direction: column; overflow: hidden;">
+
+                <div class="card-header text-white d-flex justify-content-between align-items-center"
+                     style="background-color: #E50914; padding: 15px;">
+                    <span class="fw-bold"> Chat Room: ${movie.name}</span>
+                    <button type="button" class="btn-close btn-close-white" onclick="toggleChat()"></button>
+                </div>
+
+                <div class="card-body p-0" style="flex: 1; background-color: #f0f0f0; position: relative;">
+                    <div id="chat-box" style="height: 100%; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px;">
+                        <div class="text-center text-muted small my-2">
+                            Welcome to the room!<br>Be nice to others.
                         </div>
+                    </div>
+                </div>
+
+                <div class="p-3 bg-white border-top">
+                    <input type="text" id="chat-username" class="form-control form-control-sm mb-2" placeholder="Your Name" value="Guest">
+                    <div class="input-group">
+                        <input type="text" id="chat-input" class="form-control" placeholder="Type a message...">
+                        <button class="btn btn-danger" onclick="sendMessage('${movie.id}')">➤</button>
                     </div>
                 </div>
             </div>
@@ -401,7 +429,7 @@ function displayMessage(data) {
     if (chatBox) {
         const messageHTML = `
             <div class="mb-2 text-center">
-                <strong>${data.user}</strong> <span class="text-muted small">[${data.time}]</span>: 
+                <strong>${data.user}</strong> <span class="text-muted small">[${data.time}]</span>:
                 <span>${data.text}</span>
             </div>
         `;
