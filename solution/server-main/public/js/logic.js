@@ -1,3 +1,5 @@
+let socket;
+let currentMovieId = null;
 let currentPage = 0;
 let isLoading = false;
 let hasMoreMovies = true;
@@ -12,20 +14,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.addEventListener('scroll', () => {
         const gridExists = document.getElementById('movie-grid');
-        if((window.innerHeight + window.scrollY >= document.body.offsetHeight - 100)&& gridExists) {
+        if((window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) && gridExists) {
             loadMoreMovies();
         }
     })
 
-    if (searchForm) {
-        searchForm.addEventListener('submit', (e) => executeSearch(e));
+    if(searchForm) {
+        searchForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const query = document.getElementById('search-input').value;
+
+            const spinner = document.getElementById('loading-spinner');
+            if (spinner) spinner.classList.remove('d-none');
+
+            document.getElementById('movie-grid').innerHTML = '';
+
+            if (typeof executeSearch === "function") {
+                console.log("searching for "+query);
+                await executeSearch(query);
+            } else {
+                console.error("executeSearch function is missing!");
+            }
+        });
     }
 });
 
-async function executeSearch(e) {
-    e.preventDefault();
+async function executeSearch(query) {
     console.log("executeSearch()");
-    const query = document.getElementById('search-input').value;
     const contentDiv = document.getElementById('main-content');
 
     if (!query) return;
@@ -38,25 +53,16 @@ async function executeSearch(e) {
         if (!response.ok) throw new Error("Errore nella ricerca");
 
         const movies = await response.json();
-        console.log(movies);
+        document.getElementById('loading-spinner').classList.add('d-none');
+
         if (movies.length === 0) {
             contentDiv.innerHTML = '<div class="alert alert-warning">Nessun film corrisponde ai criteri di ricerca.</div>';
             return;
         }
-        contentDiv.innerHTML = `
-            <h3 class="mb-4">Risultati ricerca</h3>
-            <div id="movie-grid" class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
-                </div>
-            <div id="scroll-spinner" class="text-center my-5 d-none">
-                <div class="spinner-border text-primary" role="status"></div>
-            </div>
-        `;
+        renderMovies(movies, false);
         currentPage = 0;
         showSpinner(false);
-
         hasMoreMovies = false;
-        appendMoviesToGrid(movies);
-
     } catch (error) {
         console.error(error);
         contentDiv.innerHTML = `<div class="alert alert-danger">Errore: ${error.message}</div>`;
@@ -83,8 +89,7 @@ async function loadMoreMovies() {
             showSpinner(false);
             return;
         }
-
-        appendMoviesToGrid(movies);
+        renderMovies(movies, true);
         currentPage++;
 
     } catch (error) {
@@ -95,73 +100,93 @@ async function loadMoreMovies() {
     }
 }
 
-function appendMoviesToGrid(movies) {
-    console.log("appendMoviesToGrid() called");
-
-    const contentDiv = document.getElementById('main-content');
-
-    if (currentPage === 0) {
-        contentDiv.innerHTML = `
-            <h3 class="mb-4">Top Rated Movies</h3>
-            <div id="movie-grid" class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
-                </div>
-            <div id="scroll-spinner" class="text-center my-5 d-none">
-                <div class="spinner-border text-primary" role="status"></div>
-            </div>
-        `;
-    }
-
-    const gridDiv = document.getElementById('movie-grid');
-
-    const moviesHTML = movies.map(movie => `
-        <div class="col animate-fade-in">
-            <div class="card h-100 shadow-sm movie-card">
-                <img src="${movie.link === 'no_link' ? PLACEHOLDER_IMG : movie.link}" 
-                     class="card-img-top" 
-                     alt="${movie.name}" 
-                     style="height: 300px; object-fit: cover;">
-                
-                <div class="card-body d-flex flex-column">
-                    <h5 class="card-title">${movie.name}</h5>
-                    ${movie.rating ? `<p class="card-text text-warning">★ ${movie.rating}</p>` : ''}
-                    <button class="btn btn-primary mt-auto" onclick="loadMovieDetails('${movie.id}')">
-                        Dettagli
-                    </button>
-                </div>
-            </div>
-        </div>
-    `).join('');
-
-    gridDiv.insertAdjacentHTML('beforeend', moviesHTML);
-}
-
 function showSpinner(show) {
-    const spinner = document.getElementById('scroll-spinner');
+    const spinner = document.getElementById('loading-spinner');
     if (spinner) {
         if (show) spinner.classList.remove('d-none');
         else spinner.classList.add('d-none');
     }
 }
 
+function toggleCast(btn) {
+    const hiddenCast = document.getElementById('extra-cast');
+    if (hiddenCast) {
+        hiddenCast.classList.toggle('d-none');
+        if (hiddenCast.classList.contains('d-none')) {
+            btn.textContent = "Show All Cast";
+        } else {
+            hiddenCast.style.display = 'contents';
+            btn.textContent = "Show Less";
+        }
+    }
+}
 
+function toggleCrew(btn) {
+    const hiddenCast = document.getElementById('extra-crew');
+    if (hiddenCast) {
+        hiddenCast.classList.toggle('d-none');
+        if (hiddenCast.classList.contains('d-none')) {
+            btn.textContent = "▼";
+        } else {
+            btn.textContent = "▲";
+        }
+    }
+}
+
+function renderMovies(movieList, shouldAppend = false) {
+    const grid = document.getElementById('movie-grid');
+    if (!shouldAppend) {
+        grid.innerHTML = '';
+    }
+
+    movieList.forEach(movie => {
+        const col = document.createElement('div');
+        col.className = 'col animate-fade-in';
+
+        col.innerHTML = `
+            <div class="card movie-card h-100 shadow-sm">
+                <img src="${movie.link === 'no_link' ? PLACEHOLDER_IMG : movie.link}"
+                    class="card-img-top" alt="${movie.name}">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">${movie.name}</h5>
+                    <p class="card-text text-light small">
+                        📅 ${movie.date || 'Unknown'} <br>
+                        ⭐ ${movie.rating || 'N/A'}
+                    </p>
+                </div>
+            </div>
+        `;
+
+        col.querySelector('.movie-card').addEventListener('click', () => {
+            loadMovieDetails(movie.id);
+        });
+
+        grid.appendChild(col);
+    });
+}
 
 async function loadMovieDetails(id) {
     console.log("loadMovieDetails() called");
+
+    document.querySelector('.hero-header').style.display = 'none';
+    document.getElementById('movie-results-section').style.display = 'none';
+
     const contentDiv = document.getElementById('main-content');
 
-    contentDiv.innerHTML = '<div class="text-center mt-5"><div class="spinner-border"></div><p>Loading data of Film...</p></div>';
-
+    contentDiv.innerHTML = '<div class="text-center mt-5"><div class="spinner-border"></div><p>Loading data...</p></div>';
+    contentDiv.style.display = 'block';
     try {
         const movieResponse = await fetch(`/getMovie/${id}`);
         if (!movieResponse.ok) throw new Error("Errore nella ricerca dei film");
 
         const movie = await movieResponse.json();
         console.log(movie);
+        currentMovieId = movie.id;
 
         let reviews = [];
         try {
             if (movie.name) {
-                const reviewsResponse = await fetch(`/searchReviews?title=${encodeURIComponent(movie.name)}`)
+                const reviewsResponse = await fetch(`/searchReviews?title=${encodeURIComponent(movie.name)}`);
                 if (reviewsResponse.ok) {
                     reviews = await reviewsResponse.json();
                     console.log(reviews);
@@ -171,51 +196,216 @@ async function loadMovieDetails(id) {
             console.warn("Errore nella ricerca delle reviews:", reviewError);
         }
 
+        let messages=[];
+        try {
+            if(movie.id){
+                const chatResponse = await fetch(`/loadChat?movieId=${encodeURIComponent(movie.id)}`);
+                if (chatResponse.ok){
+                    messages = await chatResponse.json();
+                    console.log(messages);
+                }
+            }
+        }catch (chatError) {
+            console.warn("Errore nel caricamento della chat:", chatError);
+        }
+
         contentDiv.innerHTML = `
             <div class="animate-fade-in">
                 <button class="btn btn-outline-secondary btn-sm mb-4 d-flex justify-content-start" onclick="location.reload()">← Back</button>
                 
                 <div class="row">
                     <div class="col-md-8">
-                        <h1 class="display-5">${movie.name} <small class="text-muted">(${movie.date})</small></h1>
+                        <h1 class="display-5">${movie.name} <small class="text-secondary">(${movie.date})</small></h1>
                         <p class="lead italic">"${movie.tagline}"</p>
                         <hr>
-                        <h5>Synopsis</h5>
+                        <h5 class="text-white mb-3 border-start border-4 border-danger ps-2">Summary</h5>
                         <p>${movie.description}</p>
-                        
-                        <div class="mt-4">
-                            <span class="badge bg-info text-dark">Durata: ${movie.minute} min</span>  
-                            <span class="badge bg-warning text-dark">Rating: ${movie.rating}</span>
+                        <div class="row mt-4">
+                            <div class="col-md-12 mb-3 cast-container">
+                                <h5 class="text-white mb-3 border-start border-4 border-danger ps-2">Cast</h5>
+                                <div class="d-flex flex-wrap gap-2">
+                                ${movie.actors && movie.actors.length > 0
+                                        ? movie.actors.slice(0, 15).map(actor =>
+                                            `<span class="cast-chip">${actor.name}</span>`
+                                        ).join('')
+                                        : '<span class="text-muted fst-italic">No cast info.</span>'}
+                                
+                                <span id="extra-cast" class="d-none" style="display: contents;">
+                                    ${movie.actors && movie.actors.length > 15
+                                        ? movie.actors.slice(15).map(actor =>
+                                            `<span class="cast-chip animate-fade-in">${actor.name}</span>`
+                                        ).join('')
+                                        : ''}
+                                </span>
+                            
+                                ${movie.actors && movie.actors.length > 15
+                                        ? `<span class="btn btn-outline-light btn-sm rounded-pill px-3 py-2" 
+                                             style="cursor: pointer;" 
+                                             onclick="toggleCast(this)">
+                                             +${movie.actors.length - 15} more
+                                       </span>`
+                                        : ''}
+                            </div>
+                            </div>
+                            <div class="mt-4 mb-4">
+                                <h5 class="text-white mb-3 border-start border-4 border-danger ps-2" >Production Credits</h5>
+                                <div class="row g-3">
+                                    ${movie.crew && movie.crew.length > 0
+                                        ? movie.crew.slice(0, 6).map(c => `
+                                            <div class="col-6 col-md-4">
+                                                <div class="crew-item">
+                                                    <span class="crew-role">${c.role}</span>
+                                                    <span class="crew-name">${c.name}</span>
+                                                </div>
+                                            </div>
+                                        `).join('')
+                                        : '<div class="col-12 text-muted">No crew info available.</div>'}
+                                </div>
+                                <div id="extra-crew" class="row g-3 mt-0 d-none">
+                                    ${movie.crew && movie.crew.length > 6
+                                        ? movie.crew.slice(6).map(c => `
+                                            <div class="col-6 col-md-4 animate-fade-in">
+                                                <div class="crew-item">
+                                                    <span class="crew-role">${c.role}</span>
+                                                    <span class="crew-name">${c.name}</span>
+                                                </div>
+                                            </div>
+                                        `).join('')
+                                        : ''}
+                                </div>
+                                ${movie.crew && movie.crew.length > 6 ? `
+                                    <div class="col-12 mt-3">
+                                        <button onclick="toggleCrew(this)" 
+                                                class="btn btn-outline-secondary btn-sm w-100 rounded-pill"
+                                                style="border-color: #333; color: #aaa;">
+                                            Show Full Crew ▼
+                                        </button>
+                                    </div>
+                                ` : ''}
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-4 text-center">
                         <img src="${movie.poster?.link || PLACEHOLDER_IMG}"
                              class="img-fluid rounded shadow" 
                              alt="${movie.name}"
-                             style="max-height: 690px; max-width: 460px; width: 100%; object-fit: cover;">
+                             style="width: 100%; height: auto;">
+                        <div class="mt-4">
+                            <span class="badge bg-info text-dark fs-5 p-2 me-2">Durata: ${movie.minute} min</span>
+                            <span class="badge bg-warning text-dark fs-5 p-2">★ ${movie.rating || 'N/A'}</span>
+                        </div>
                     </div>
                 </div>
 
                 <div class="row mt-5">
                     <div class="col-12">
-                        <h4>Reviews (da Rotten Tomatoes)</h4>
+                        <h4>Reviews (from Rotten Tomatoes)</h4>
                         <div class="list-group mt-3">
                             ${reviews.length > 0 ? reviews.map(r => `
-                                <div class="list-group-item border-start border-4 ${r.review_type === 'Fresh' ? 'border-success' : 'border-danger'}">
+                                <div class="list-group-item mt-4 border-start border-2 ${r.review_type === 'Fresh' ? 'border-success' : 'border-danger'}">
                                     <div class="d-flex w-100 justify-content-between">
                                         <h6 class="mb-1">${r.critic_name} <small class="text-muted">from ${r.publisher_name}</small></h6>
                                         <span class="badge ${r.review_type === 'Fresh' ? 'bg-success' : 'bg-danger'}">${r.review_type}</span>
                                     </div>
-                                    <p class="mb-1 small">"${r.review_content}"</p>
+                                    ${r.review_content
+                                    ? `<p class="mb-1 small fst-italic">"${r.review_content}"</p>`
+                                    : ''}
                                 </div>
                             `).join('') : '<p class="text-muted">No reviews found for this title.</p>'}
                         </div>
                     </div>
                 </div>
+                
+                <div class="row mt-5 mb-5">
+                    <div class="col-12">
+                        <div class="card shadow">
+                            <div class="card-header text-white" style="background-color: #E50914">
+                                Movie Chat Room - Have fun!
+                            </div>
+                            <div class="card-body">
+                                <div id="chat-box" style="height: 300px; overflow-y: scroll; border: 1px solid #ddd; padding: 10px; margin-bottom: 15px; background-color: #f9f9f9;">
+                                    <div class="text-center text-muted small" >Benvenuto nella chat di ${movie.name}!</div>
+                                </div>
+                
+                                <div class="input-group">
+                                    <input type="text" id="chat-username" class="form-control" placeholder="Il tuo nome..." style="max-width: 150px;">
+                                    <input type="text" id="chat-input" class="form-control" placeholder="Scrivi un messaggio...">
+                                    <button class="btn btn-primary" onclick="sendMessage('${movie.id}')">Invia</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         `;
+
+        messages.forEach(msg => {
+            displayMessage({
+                user: msg.user,
+                text: msg.text,
+                time: msg.timestamp
+            });
+        });
+
+        try {
+            if (!socket) {
+                socket = io();
+                socket.on('message', (movieId, user, text, time) => {
+                    console.log(`Incoming message for room ${movieId}. Current room is ${currentMovieId}`);
+                    if (String(movieId) === String(currentMovieId)) {
+                        displayMessage({ user: user, text: text, time: time });
+                    }
+                });
+            }
+            console.log(`Joining room: ${movie.id}`);
+            socket.emit('join_room', movie.id);
+        }catch (error) {
+            console.error("Socket error:", error);
+        }
     } catch (error) {
         console.error(error);
         contentDiv.innerHTML = `<div class="alert alert-danger">Failed to load movie details.</div>`;
+    }
+}
+
+
+function sendMessage(movieId) {
+    const inputField = document.getElementById('chat-input');
+    const userField = document.getElementById('chat-username');
+
+    const text = inputField.value;
+    const user = userField.value || "Anonymous";
+    const time = new Date().toLocaleTimeString();
+
+    if (text.trim() !== "") {
+        socket.emit('message', movieId, user, text, time);
+
+        //displayMessage({ user: user, text: text, time: time });
+
+        inputField.value = "";
+    }else{
+        inputField.value = "";
+
+        inputField.placeholder = "Cannot send empty message!";
+        inputField.classList.add('is-invalid');
+
+        setTimeout(() => {
+            inputField.placeholder = "Scrivi un messaggio...";
+            inputField.classList.remove('is-invalid');
+        }, 2000);
+    }
+}
+
+function displayMessage(data) {
+    const chatBox = document.getElementById('chat-box');
+    if (chatBox) {
+        const messageHTML = `
+            <div class="mb-2 text-center">
+                <strong>${data.user}</strong> <span class="text-muted small">[${data.time}]</span>: 
+                <span>${data.text}</span>
+            </div>
+        `;
+        chatBox.insertAdjacentHTML('beforeend', messageHTML);
+        chatBox.scrollTop = chatBox.scrollHeight;
     }
 }
