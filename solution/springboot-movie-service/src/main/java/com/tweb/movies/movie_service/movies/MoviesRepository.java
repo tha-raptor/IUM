@@ -5,6 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,6 +14,18 @@ import java.util.Optional;
 @Repository
 public interface MoviesRepository extends JpaRepository<Movie, Integer> {
 
+	// Film paginati, ordine per rating
+	@Query("SELECT new com.tweb.movies.movie_service.dtos.MovieTitlePosterRatingDTO(m.id, m.name, m.poster.link, m.rating) " +
+			"FROM Movie m " +
+			"WHERE m.rating IS NOT NULL " +
+			"ORDER BY m.rating DESC")
+	Page<MovieTitlePosterRatingDTO> findAllByRatingDesc(Pageable pageable);
+
+	// Film "leggeri", ordine per rating
+	@Query("SELECT new com.tweb.movies.movie_service.dtos.MovieTitlePosterDTO(m.id, m.name, m.poster.link) " +
+			"FROM Movie m " +
+			"ORDER BY m.rating DESC")
+	List<MovieTitlePosterDTO> findAllLight();
 
 	// Film top 10, ordine per rating
 	@Query(value="SELECT new com.tweb.movies.movie_service.dtos.MovieTitlePosterDescDTO(m.id, m.name, m.description, m.rating, m.poster.link) " +
@@ -47,7 +61,7 @@ public interface MoviesRepository extends JpaRepository<Movie, Integer> {
 			"LIMIT 20")
 	List<MovieTitlePosterDTO> findTop20MoviesByGenre(@Param("genreName") String genreName);
 
-	// Film per età, ordine per rating
+	// Film per etÃ , ordine per rating
 	@Query(value="SELECT DISTINCT new com.tweb.movies.movie_service.dtos.MovieTitlePosterRatingDTO(m.id, m.name, m.poster.link, m.rating) " +
 			"FROM Movie m " +
 			"JOIN Release r on r.movie.id = m.id " +

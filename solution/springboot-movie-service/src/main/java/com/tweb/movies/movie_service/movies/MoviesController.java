@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
 import java.util.Optional;
@@ -49,7 +50,7 @@ public class MoviesController {
         return moviesService.searchMoviesByName(name);
     }
 
-    @Operation(summary = "Get movies by Genre", description = "Returns top 20 movies for a specific genre")
+    @Operation(summary = "Get movies by Genre", description = "Returns movies for a specific genre")
     @GetMapping("/genre/{genreName}")
     public List<MovieTitlePosterDTO> getMoviesByGenre(@PathVariable String genreName) {
         return moviesService.getMoviesByGenre(genreName);
@@ -60,7 +61,14 @@ public class MoviesController {
     public List<MovieTitlePosterRatingDTO> getMoviesByAge(@PathVariable int ageMin) {
         return moviesService.getMoviesByAge(ageMin);
     }
-
+    @Operation(summary = "Get Paged Movies", description = "Returns paged movies sorted by rating")
+    @GetMapping("/paged")
+    public List<MovieTitlePosterRatingDTO> getMoviesPaged(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "30") int size
+    ) {
+        return moviesService.getMoviesPaged(page, size).getContent();
+    }
     @Operation(summary = "Get Worldwide Movies", description = "Returns movies sorted by release count across countries")
     @GetMapping("/worldwide")
     public List<MovieTitlePosterCountDTO> getWorldwideMovies() {
