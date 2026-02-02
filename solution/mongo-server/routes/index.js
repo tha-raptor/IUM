@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const Review = require('../models/Review'); // Reaching up to your models folder
+const Review = require('../models/Review');
 
 const port = 3001;
 
@@ -8,7 +8,6 @@ const port = 3001;
 router.get('/', (req, res) => {
     res.send('Reviews API running on port: ' + port + '');
 });
-
 
 router.get('/api/reviews/search', async (req, res) => {
     const title = req.query.title;

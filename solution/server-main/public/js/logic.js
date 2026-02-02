@@ -13,8 +13,9 @@ document.addEventListener('DOMContentLoaded', () => {
     loadMoreMovies();
 
     window.addEventListener('scroll', () => {
-        const gridExists = document.getElementById('movie-grid');
-        if((window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) && gridExists) {
+        let gridExists = document.getElementById('movie-grid');
+        let btnExists = document.getElementById('btn_back');
+        if((window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) && gridExists && !isLoading && !btnExists) {
             loadMoreMovies();
         }
     })
@@ -164,7 +165,7 @@ function renderMovies(movieList, shouldAppend = false) {
 
         col.innerHTML = `
             <div class="card movie-card h-100 text-white" style="background-color: #1f1f1f; border: none; cursor: pointer;">
-                <img src="${movie.link === 'no_link' ? PLACEHOLDER_IMG : movie.link}"
+                <img src="${movie.poster === 'no_link' ? PLACEHOLDER_IMG : movie.poster}"
                     class="movie-poster" alt="${movie.name}">
                 <div class="card-body d-flex flex-column overlay">
                     <h5 class="card-title">${movie.name}</h5>
@@ -198,7 +199,7 @@ async function loadMovieDetails(id) {
         if (!movieResponse.ok) throw new Error("Errore nella ricerca dei film");
 
         const movie = await movieResponse.json();
-        console.log(movie);
+        console.log("Movie details"+movie);
         currentMovieId = movie.id;
 
         let reviews = [];
@@ -229,7 +230,7 @@ async function loadMovieDetails(id) {
 
         contentDiv.innerHTML = `
             <div class="animate-fade-in">
-                <button class="btn btn-outline-secondary btn-sm mb-4 d-flex justify-content-start" onclick="location.reload()">← Back</button>
+                <button id="btn_back" class="btn btn-outline-secondary btn-sm mb-4 d-flex justify-content-start" onclick="location.reload()">← Back</button>
                 
                 <div class="row">
                     <div class="col-md-8">
