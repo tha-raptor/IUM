@@ -1,0 +1,152 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+body {
+    background-color: #141414;
+    color: #e5e5e5;
+    font-family: 'Poppins', sans-serif;
+}
+
+.navbar {
+    background-color: #000000;
+    padding: 15px 0;
+}
+.navbar-brand {
+    color: #E50914 !important; /* Netflix Red */
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.hero-header {
+    background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=2070&auto=format&fit=crop');
+    background-size: cover;
+    background-position: center;
+    height: 50vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.search-input {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid #555;
+    color: white;
+    border-radius: 50px;
+    padding: 15px 25px;
+    width: 100%;
+    max-width: 500px;
+}
+.search-input:focus {
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    border-color: #E50914;
+    box-shadow: none;
+}
+
+.movie-card {
+    position: relative;
+    border: none;
+    border-radius: 6px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    height: 100%;
+}
+
+.movie-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 20px rgba(229, 9, 20, 0.4);
+}
+
+.card-body {
+    padding: 15px;
+}
+
+.movie-poster {
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    object-fit: cover;
+    object-position: top center;
+    display: block;
+}
+.overlay{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 2
+
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(6px);
+    border-top: 2px solid rgba(255, 255, 255, 0.1);
+}
+.overlay h5,
+.overlay p {
+    text-shadow: 0 2px 2px rgba(0, 0, 0, 0.9),
+                 0 0 5px rgba(0, 0, 0, 0.7);
+}
+.card-title {
+    color: white;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.btn-primary {
+    background-color: #E50914;
+    border: none;
+}
+.btn-primary:hover {
+    background-color: #b2070f;
+}
+.cast-chip {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #e5e5e5;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50px;
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    cursor: default;
+    transition: all 0.2s ease;
+    display: inline-block;
+}
+
+.cast-chip:hover {
+    background-color: #E50914;
+    border-color: #E50914;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.cast-container {
+    margin-top: 15px;
+    margin-bottom: 20px;
+}
+
+.crew-item {
+    padding-left: 12px;
+    border-left: 2px solid #333;
+    transition: all 0.2s ease;
+}
+
+.crew-item:hover {
+    border-left-color: #E50914;
+    background: rgba(255,255,255, 0.02);
+}
+
+.crew-role {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #888;
+    display: block;
+    margin-bottom: 2px;
+}
+
+.crew-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #e5e5e5;
+}
