@@ -368,6 +368,8 @@ async function loadMovieDetails(id) {
             </div>
         `;
 
+        showSpinner(false);
+
         messages.forEach(msg => {
             displayMessage({
                 user: msg.user,
