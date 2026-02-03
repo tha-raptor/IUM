@@ -3,6 +3,7 @@ let currentMovieId = null;
 let currentPage = 0;
 let isLoading = false;
 let hasMoreMovies = true;
+let currentGenre = "";
 const PLACEHOLDER_IMG = 'https://placehold.co/300x450?text=No+Poster';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -71,34 +72,62 @@ async function executeSearch(query) {
 }
 
 async function loadMoreMovies() {
-    console.log("loadMoreMovies() called");
-
     if (isLoading || !hasMoreMovies) return;
 
     isLoading = true;
     showSpinner(true);
 
     try {
-        console.log(`Caricamento pagina ${currentPage}...`);
+        console.log(`Loading page ${currentPage}... (Genre: ${currentGenre || 'All'})`);
 
-        const response = await fetch(`/paged?page=${currentPage}`);
+        let url;
+        if (currentGenre) {
+            url = `/genre/${encodeURIComponent(currentGenre)}?page=${currentPage}`;
+        } else {
+            url = `/paged?page=${currentPage}`;
+        }
+
+        const response = await fetch(url);
+        if (!response.ok) throw new Error("Fetch failed");
+
         const movies = await response.json();
-        console.log(`Pagina ${currentPage} caricata.`);
-        console.log(movies);
+
         if (movies.length === 0) {
             hasMoreMovies = false;
-            showSpinner(false);
-            return;
+        } else {
+            renderMovies(movies, true);
+            currentPage++;
         }
-        renderMovies(movies, true);
-        currentPage++;
 
     } catch (error) {
-        console.error("Errore scroll:", error);
+        console.error("Scroll error:", error);
     } finally {
         isLoading = false;
         showSpinner(false);
     }
+}
+
+async function searchByGenre(genreName) {
+    console.log("Searching by genre:", genreName);
+
+    const sideMenu = document.getElementById('sideMenu');
+    const bsOffcanvas = bootstrap.Offcanvas.getInstance(sideMenu);
+    if (bsOffcanvas) bsOffcanvas.hide();
+
+    document.getElementById('main-content').style.display = 'none';
+    document.querySelector('.hero-header').style.display = 'block';
+    const resultsSection = document.getElementById('movie-results-section');
+    resultsSection.style.display = 'block';
+
+    currentGenre = genreName;
+    currentPage = 0;
+    hasMoreMovies = true;
+
+    document.getElementById('movie-grid').innerHTML = '';
+    const sectionTitle = resultsSection.querySelector('h4');
+    if(sectionTitle) sectionTitle.innerHTML = `Genre: <span class="text-danger">${genreName}</span>`;
+
+    loadMoreMovies();
 }
 
 function showSpinner(show) {
@@ -396,46 +425,6 @@ async function loadMovieDetails(id) {
     } catch (error) {
         console.error(error);
         contentDiv.innerHTML = `<div class="alert alert-danger">Failed to load movie details.</div>`;
-    }
-}
-
-async function searchByGenre(genreName) {
-    console.log("Searching by genre:", genreName);
-
-    const sideMenu = document.getElementById('sideMenu');
-    const bsOffcanvas = bootstrap.Offcanvas.getInstance(sideMenu);
-    if (bsOffcanvas) bsOffcanvas.hide();
-
-    document.getElementById('main-content').style.display = 'none';
-    document.querySelector('.hero-header').style.display = 'block';
-    const resultsSection = document.getElementById('movie-results-section');
-    resultsSection.style.display = 'block';
-
-    const sectionTitle = resultsSection.querySelector('h4');
-    if(sectionTitle) sectionTitle.innerHTML = `Genre: <span class="text-danger">${genreName}</span>`;
-
-    const grid = document.getElementById('movie-grid');
-    grid.innerHTML = '';
-    showSpinner(true);
-    hasMoreMovies = false;
-
-    try {
-        const response = await fetch(`/genre/${genreName}`);
-
-        if (!response.ok) throw new Error("Genre search failed");
-
-        const movies = await response.json();
-
-        if (movies.length === 0) {
-            grid.innerHTML = '<p class="text-white text-center">No movies found for this genre.</p>';
-        } else {
-            renderMovies(movies, false);
-        }
-    } catch (error) {
-        console.error("Genre fetch error:", error);
-        grid.innerHTML = `<div class="alert alert-danger">Error loading genre: ${genreName}</div>`;
-    } finally {
-        showSpinner(false);
     }
 }
 

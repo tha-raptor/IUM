@@ -24,7 +24,7 @@ public interface MoviesRepository extends JpaRepository<Movie, Integer> {
 			"FROM Movie m " +
 			"WHERE m.rating IS NOT NULL " +
 			"ORDER BY m.rating DESC")
-	Page<MovieTitlePosterRatingDTO> findAllByRatingDesc(Pageable pageable);
+	Page<MovieTitlePosterRatingDTO> findAllMoviesPaged(Pageable pageable);
 
 	// Film "leggeri", ordine per rating
 	@Query("SELECT new com.tweb.movies.movie_service.movies.dtos.MovieTitlePosterDTO(m.id, m.name, m.poster.link) " +
@@ -62,9 +62,8 @@ public interface MoviesRepository extends JpaRepository<Movie, Integer> {
 			"FROM Movie m " +
 			"JOIN Genre g ON g.movie.id = m.id " +
 			"WHERE g.genre = :genreName AND m.rating IS NOT NULL " +
-			"ORDER BY m.rating DESC " +
-			"LIMIT 20")
-	List<MovieTitlePosterRatingDTO> findTop20MoviesByGenre(@Param("genreName") String genreName);
+			"ORDER BY m.rating DESC ")
+	Page<MovieTitlePosterRatingDTO> findMoviesByGenre(@Param("genreName") String genreName, Pageable pageable);
 
 	// Film per etÃ , ordine per rating
 	@Query(value="SELECT DISTINCT new com.tweb.movies.movie_service.movies.dtos.MovieTitlePosterRatingDTO(m.id, m.name, m.poster.link, m.rating) " +

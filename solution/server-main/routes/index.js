@@ -38,6 +38,8 @@ router.get('/getMovie/:id', async (req, res, next) => {
 });
 
 router.get('/genre/:name', async (req, res, next) => {
+
+    const page = req.query.page || 0;
     const genreName = req.params.name;
 
     if (!genreName) {
@@ -45,7 +47,12 @@ router.get('/genre/:name', async (req, res, next) => {
     }
     try {
         console.log(`Forwarding genre search for: ${genreName} to Spring Boot`);
-        const response = await axios.get(`${SPRING_BOOT_URL}/movies/genre/${genreName}`);
+        const response = await axios.get(`${SPRING_BOOT_URL}/movies/genre/${genreName}`,{
+                    params: {
+                        page: page,
+                        size: 30
+                    }
+                });
         res.json(response.data);
     } catch (error) {
         handleError(error, next);

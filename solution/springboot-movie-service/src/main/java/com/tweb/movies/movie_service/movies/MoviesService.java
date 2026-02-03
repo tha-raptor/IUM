@@ -4,6 +4,7 @@ import com.tweb.movies.movie_service.movies.dtos.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
@@ -49,9 +50,9 @@ public class MoviesService {
         return movieRepository.findMovieByNameStartingWith(name);
     }
 
-    //Film per genere
-    public List<MovieTitlePosterRatingDTO> getMoviesByGenre(String genreName) {
-        return movieRepository.findTop20MoviesByGenre(genreName);
+    //Film per genere paginati
+    public Page<MovieTitlePosterRatingDTO> getMoviesByGenre(String genreName, Pageable pageable) {
+        return movieRepository.findMoviesByGenre(genreName, pageable);
     }
 
     // Film per età minima
@@ -65,7 +66,7 @@ public class MoviesService {
     }
 
     //Film paginati
-    public Page<MovieTitlePosterRatingDTO> getMoviesPaged(int page,int size) {
-        return movieRepository.findAllByRatingDesc(PageRequest.of(page, size));
+    public Page<MovieTitlePosterRatingDTO> getMoviesPaged(Pageable pageable) {
+        return movieRepository.findAllMoviesPaged(pageable);
     }
 }

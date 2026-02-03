@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
@@ -88,15 +89,21 @@ public class MoviesController {
     }
 
     /**
-     * Filters movies by a specific genre.
-     * * @param genreName The name of the genre.
-     * @return A list of movies belonging to the specified genre.
+     * Retrieves a paginated list of movies filtered by genres sorted by rating.
+     * * @param page The page index to retrieve (starts at 0).
+     * @param size The number of records per page.
+     * @return A list of movies of that genre for the requested page.
      */
-    @Operation(summary = "Get movies by Genre", description = "Returns movies for a specific genre")
+    @Operation(summary = "Get paged movies by Genre", description = "Returns paginated movies for a specific genre")
     @ApiResponse(responseCode = "200", description = "Genre-based list retrieved")
     @GetMapping("/genre/{genreName}")
-    public List<MovieTitlePosterRating DTO> getMoviesByGenre(@PathVariable String genreName) {
-        return moviesService.getMoviesByGenre(genreName);
+    public List<MovieTitlePosterRatingDTO> getMoviesByGenre(
+            @PathVariable String genreName,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "30") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        return moviesService.getMoviesByGenre(genreName, pageable).getContent();
     }
 
     /**
@@ -124,7 +131,8 @@ public class MoviesController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "30") int size
     ) {
-        return moviesService.getMoviesPaged(page, size).getContent();
+        Pageable pageable = PageRequest.of(page, size);
+        return moviesService.getMoviesPaged(pageable).getContent();
     }
 
     /**
