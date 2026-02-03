@@ -1,6 +1,6 @@
 package com.tweb.movies.movie_service.movies;
 
-import com.tweb.movies.movie_service.dtos.*;
+import com.tweb.movies.movie_service.movies.dtos.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
@@ -9,6 +9,16 @@ import org.springframework.data.domain.PageRequest;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Service class that handles the logic for Movie operations.
+ * <p>
+ * This class acts as an intermediary between the Controller and the Repository.
+ * </p>
+ *
+ * @author
+ * @version 1.0
+ * @see MoviesRepository
+ */
 @Service
 public class MoviesService {
 
@@ -47,11 +57,6 @@ public class MoviesService {
     // Film per età minima
     public List<MovieTitlePosterRatingDTO> getMoviesByAge(int ageMin) {
         return movieRepository.findTop20MoviesByAgeMin(ageMin);
-    }
-
-    // Tutti i film globali + count
-    public List<MovieTitlePosterCountDTO> getWorldwideMovies() {
-        return movieRepository.findWorldwideMovies();
     }
 
     // Film per lingua e rating

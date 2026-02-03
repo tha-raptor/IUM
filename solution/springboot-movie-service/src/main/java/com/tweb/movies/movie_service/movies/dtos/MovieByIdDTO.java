@@ -1,4 +1,4 @@
-package com.tweb.movies.movie_service.dtos;
+package com.tweb.movies.movie_service.movies.dtos;
 
 public interface MovieByIdDTO {
     Integer getId();

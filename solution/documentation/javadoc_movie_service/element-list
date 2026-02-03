@@ -1,0 +1,14 @@
+com.tweb.movies.movie_service
+com.tweb.movies.movie_service.actors
+com.tweb.movies.movie_service.actors.dtos
+com.tweb.movies.movie_service.config
+com.tweb.movies.movie_service.countries
+com.tweb.movies.movie_service.crew
+com.tweb.movies.movie_service.genres
+com.tweb.movies.movie_service.languages
+com.tweb.movies.movie_service.movies
+com.tweb.movies.movie_service.movies.dtos
+com.tweb.movies.movie_service.posters
+com.tweb.movies.movie_service.releases
+com.tweb.movies.movie_service.studios
+com.tweb.movies.movie_service.themes

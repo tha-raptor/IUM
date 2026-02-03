@@ -1,6 +1,6 @@
 package com.tweb.movies.movie_service.movies;
 
-import com.tweb.movies.movie_service.dtos.*;
+import com.tweb.movies.movie_service.movies.dtos.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -11,7 +11,12 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.Optional;
 
-@Repository
+/**
+ * Repository interface for accessing Movie data from the database.
+ *
+ * @author Beqiraj-Nada
+ * @version 1.0
+ */
 public interface MoviesRepository extends JpaRepository<Movie, Integer> {
 
 	// Film paginati, ordine per rating
@@ -72,15 +77,6 @@ public interface MoviesRepository extends JpaRepository<Movie, Integer> {
 
 	// Film per ID
 	Optional<Movie> findMovieById(Integer id);
-
-	// Film globali, ordine per release, rating
-	@Query(value = "SELECT new com.tweb.movies.movie_service.dtos.MovieTitlePosterCountDTO(m.id, m.name, m.poster.link, m.rating, COUNT(r.country)) " +
-			"FROM Movie m " +
-			"JOIN Release r ON m.id = r.movie.id " +
-			"GROUP BY m.id, m.name, m.poster.link, m.rating " +
-			"ORDER BY COUNT(r.country) DESC, m.rating DESC " +
-			"LIMIT 20")
-	List<MovieTitlePosterCountDTO> findWorldwideMovies();
 
 	// Film per lingua, ordine per rating
 	@Query(value="SELECT new com.tweb.movies.movie_service.dtos.MovieTitlePosterDTO(m.id, m.name, m.poster.link) FROM Movie m " +
