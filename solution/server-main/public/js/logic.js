@@ -399,6 +399,45 @@ async function loadMovieDetails(id) {
     }
 }
 
+async function searchByGenre(genreName) {
+    console.log("Searching by genre:", genreName);
+
+    const sideMenu = document.getElementById('sideMenu');
+    const bsOffcanvas = bootstrap.Offcanvas.getInstance(sideMenu);
+    if (bsOffcanvas) bsOffcanvas.hide();
+
+    document.getElementById('main-content').style.display = 'none';
+    document.querySelector('.hero-header').style.display = 'block';
+    const resultsSection = document.getElementById('movie-results-section');
+    resultsSection.style.display = 'block';
+
+    const sectionTitle = resultsSection.querySelector('h4');
+    if(sectionTitle) sectionTitle.innerHTML = `Genre: <span class="text-danger">${genreName}</span>`;
+
+    const grid = document.getElementById('movie-grid');
+    grid.innerHTML = '';
+    showSpinner(true);
+    hasMoreMovies = false;
+
+    try {
+        const response = await fetch(`/genre/${genreName}`);
+
+        if (!response.ok) throw new Error("Genre search failed");
+
+        const movies = await response.json();
+
+        if (movies.length === 0) {
+            grid.innerHTML = '<p class="text-white text-center">No movies found for this genre.</p>';
+        } else {
+            renderMovies(movies, false);
+        }
+    } catch (error) {
+        console.error("Genre fetch error:", error);
+        grid.innerHTML = `<div class="alert alert-danger">Error loading genre: ${genreName}</div>`;
+    } finally {
+        showSpinner(false);
+    }
+}
 
 function sendMessage(movieId) {
     const inputField = document.getElementById('chat-input');

@@ -58,13 +58,13 @@ public interface MoviesRepository extends JpaRepository<Movie, Integer> {
 	List<MovieByNameDTO> findMovieByNameStartingWith(@Param("name") String name);
 
 	// Film per genere, ordine per rating
-	@Query(value = "SELECT new com.tweb.movies.movie_service.movies.dtos.MovieTitlePosterDTO(m.id, m.name, m.poster.link) " +
+	@Query(value = "SELECT new com.tweb.movies.movie_service.movies.dtos.MovieTitlePosterRatingDTO(m.id, m.name, m.poster.link, m.rating) " +
 			"FROM Movie m " +
 			"JOIN Genre g ON g.movie.id = m.id " +
 			"WHERE g.genre = :genreName AND m.rating IS NOT NULL " +
 			"ORDER BY m.rating DESC " +
 			"LIMIT 20")
-	List<MovieTitlePosterDTO> findTop20MoviesByGenre(@Param("genreName") String genreName);
+	List<MovieTitlePosterRatingDTO> findTop20MoviesByGenre(@Param("genreName") String genreName);
 
 	// Film per etÃ , ordine per rating
 	@Query(value="SELECT DISTINCT new com.tweb.movies.movie_service.movies.dtos.MovieTitlePosterRatingDTO(m.id, m.name, m.poster.link, m.rating) " +

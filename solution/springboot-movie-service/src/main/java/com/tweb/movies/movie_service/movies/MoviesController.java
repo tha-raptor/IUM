@@ -89,13 +89,13 @@ public class MoviesController {
 
     /**
      * Filters movies by a specific genre.
-     * * @param genreName The name of the genre (e.g., 'Action', 'Drama').
+     * * @param genreName The name of the genre.
      * @return A list of movies belonging to the specified genre.
      */
     @Operation(summary = "Get movies by Genre", description = "Returns movies for a specific genre")
     @ApiResponse(responseCode = "200", description = "Genre-based list retrieved")
     @GetMapping("/genre/{genreName}")
-    public List<MovieTitlePosterDTO> getMoviesByGenre(@PathVariable String genreName) {
+    public List<MovieTitlePosterRating DTO> getMoviesByGenre(@PathVariable String genreName) {
         return moviesService.getMoviesByGenre(genreName);
     }
 

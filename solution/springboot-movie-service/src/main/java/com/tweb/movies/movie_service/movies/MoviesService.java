@@ -50,7 +50,7 @@ public class MoviesService {
     }
 
     //Film per genere
-    public List<MovieTitlePosterDTO> getMoviesByGenre(String genreName) {
+    public List<MovieTitlePosterRatingDTO> getMoviesByGenre(String genreName) {
         return movieRepository.findTop20MoviesByGenre(genreName);
     }
 

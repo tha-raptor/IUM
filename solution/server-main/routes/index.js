@@ -37,11 +37,26 @@ router.get('/getMovie/:id', async (req, res, next) => {
    }
 });
 
+router.get('/genre/:name', async (req, res, next) => {
+    const genreName = req.params.name;
+
+    if (!genreName) {
+        handleError(new Error('Parameter \'Genre\' is required'), next);
+    }
+    try {
+        console.log(`Forwarding genre search for: ${genreName} to Spring Boot`);
+        const response = await axios.get(`${SPRING_BOOT_URL}/movies/genre/${genreName}`);
+        res.json(response.data);
+    } catch (error) {
+        handleError(error, next);
+    }
+});
+
 router.get('/search', async (req, res, next) => {
     const title = req.query.q;
 
     if (!title) {
-        handleError(new Error('Parameter \'q\' is required'), next);
+        handleError(new Error('Parameter \'title\' is required'), next);
     }
     try {
         const response = await axios.get(`${SPRING_BOOT_URL}/movies/search`, {
@@ -58,7 +73,7 @@ router.get('/searchReviews', async (req, res, next) => {
     const title = req.query.title;
 
     if (!title) {
-        return next(createError(400, 'Parameter \'title\' is required'));
+        handleError(new Error('Parameter \'title\' is required'), next);
     }
 
     try {

@@ -6,13 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"  rel="stylesheet">
 
     <link rel="icon" type="image/png" href="img/icon.png">
     <link rel="stylesheet" href="css/style.css">
-    <script src="js/logic.js"></script>
-    <script src="/socket.io/socket.io.js"></script>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -21,9 +19,86 @@
 <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
     <div class="container">
         <a class="navbar-brand" href="/">🎬 MovieApp</a>
-        <div class="d-flex align-items-center ms-auto"></div>
+        <button class="btn btn-outline-light ms-auto border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#sideMenu" aria-controls="sideMenu">
+            <i class="fas fa-bars fa-lg"></i>
+        </button>
     </div>
 </nav>
+
+<div class="offcanvas offcanvas-end text-bg-dark" tabindex="-1" id="sideMenu" aria-labelledby="sideMenuLabel">
+    <div class="offcanvas-header border-bottom border-secondary">
+        <h5 class="offcanvas-title" id="sideMenuLabel">Menu</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <p class="text-white-50 small text-uppercase fw-bold mb-3">Browse Genres</p>
+        <div class="list-group list-group-flush">
+
+            <a href="#" onclick="searchByGenre('Action')" class="list-group-item list-group-item-action bg-transparent text-white border-0 ps-0">
+                <i class="fas fa-fire me-2 text-danger"></i> Action</a>
+
+            <a href="#" onclick="searchByGenre('Adventure')" class="list-group-item list-group-item-action bg-transparent text-white border-0 ps-0">
+                <i class="fas fa-compass me-2 text-success"></i> Adventure</a>
+
+            <a href="#" onclick="searchByGenre('Comedy')" class="list-group-item list-group-item-action bg-transparent text-white border-0 ps-0">
+                <i class="fas fa-laugh-beam me-2 text-warning"></i> Comedy</a>
+
+            <a href="#" onclick="searchByGenre('Family')" class="list-group-item list-group-item-action bg-transparent text-white border-0 ps-0">
+                <i class="fas fa-users me-2 text-info"></i> Family</a>
+
+            <a href="#" onclick="searchByGenre('Animation')" class="list-group-item list-group-item-action bg-transparent text-white border-0 ps-0">
+                <i class="fas fa-magic me-2 text-primary"></i> Animation</a>
+
+            <a href="#" onclick="searchByGenre('Drama')" class="list-group-item list-group-item-action bg-transparent text-white border-0 ps-0">
+                <i class="fas fa-theater-masks me-2 text-white-50"></i> Drama</a>
+
+            <a href="#" onclick="searchByGenre('Romance')" class="list-group-item list-group-item-action bg-transparent text-white border-0 ps-0">
+                 <i class="fas fa-heart me-2 text-danger"></i> Romance</a>
+
+             <a href="#" onclick="searchByGenre('Music')" class="list-group-item list-group-item-action bg-transparent text-white border-0 ps-0">
+                <i class="fas fa-music me-2 text-warning"></i> Music</a>
+
+            <a onclick="searchByGenre('Action')" class="list-group-item list-group-item-action bg-transparent text-white border-0 ps-0">
+                <i class="fas fa-ghost me-2 text-secondary"></i> Horror</a>
+
+            <a href="#" onclick="searchByGenre('Thriller')" class="list-group-item list-group-item-action bg-transparent text-white border-0 ps-0">
+                <i class="fas fa-user-secret me-2 text-secondary"></i> Thriller</a>
+
+            <a href="#" onclick="searchByGenre('Crime')" class="list-group-item list-group-item-action bg-transparent text-white border-0 ps-0">
+                <i class="fas fa-fingerprint me-2 text-secondary"></i> Crime</a>
+
+            <a onclick="searchByGenre('Mystery')" class="list-group-item list-group-item-action bg-transparent text-white border-0 ps-0">
+                <i class="fas fa-search me-2 text-secondary"></i> Mystery</a>
+
+            <a onclick="searchByGenre('Horror')" class="list-group-item list-group-item-action bg-transparent text-white border-0 ps-0">
+                <i class="fas fa-ghost me-2 text-white"></i> Horror</a>
+
+            <a onclick="searchByGenre('Science Fiction')" class="list-group-item list-group-item-action bg-transparent text-white border-0 ps-0">
+                <i class="fas fa-rocket me-2 text-info"></i> Science Fiction</a>
+
+            <a onclick="searchByGenre('Fantasy')" class="list-group-item list-group-item-action bg-transparent text-white border-0 ps-0">
+                <i class="fas fa-dragon me-2 text-success"></i> Fantasy</a>
+
+            <a onclick="searchByGenre('History')" class="list-group-item list-group-item-action bg-transparent text-white border-0 ps-0">
+                <i class="fas fa-landmark me-2 text-warning"></i> History</a>
+
+            <a onclick="searchByGenre('War')" class="list-group-item list-group-item-action bg-transparent text-white border-0 ps-0">
+                <i class="fas fa-fighter-jet me-2 text-danger"></i> War</a>
+
+            <a onclick="searchByGenre('Western')" class="list-group-item list-group-item-action bg-transparent text-white border-0 ps-0">
+                <i class="fas fa-hat-cowboy me-2 text-warning"></i> Western</a>
+
+            <a onclick="searchByGenre('TV Movie')" class="list-group-item list-group-item-action bg-transparent text-white border-0 ps-0">
+                <i class="fas fa-tv me-2 text-info"></i> TV Movie</a>
+
+            <a onclick="searchByGenre('Documentary')" class="list-group-item list-group-item-action bg-transparent text-white border-0 ps-0">
+                <i class="fas fa-book-open me-2 text-success"></i> Documentary </a>
+        </div>
+
+        <hr class="border-secondary my-4">
+
+    </div>
+</div>
 
 <div class="hero-header">
     <div class="container">
@@ -42,9 +117,8 @@
 <div class="container pb-5">
 
     <div id="movie-results-section">
-        <h4 class="mb-4 text-white border-start border-4 border-danger ps-3">Search Results</h4>
+        <h4 class="mb-4 text-white border-start border-4 border-danger ps-3">Our best movies</h4>
         <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4" id="movie-grid">
-            <p class="text-muted">Start by searching for a movie above...</p>
         </div>
     </div>
 
@@ -55,6 +129,10 @@
     <div id="main-content" class="mt-4"></div>
 
 </div>
+
+<script src="js/logic.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>
