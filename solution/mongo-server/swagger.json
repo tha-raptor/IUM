@@ -1,0 +1,146 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Mongo Server API (TomatoesDB)",
+    "version": "1.0.0",
+    "description": "API for managing Movie Reviews and Chat History.",
+    "contact": {
+      "name": "Student One & Student Two",
+      "email": "student1@uni.edu, student2@uni.edu"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3001",
+      "description": "Local MongoDB Service"
+    }
+  ],
+  "components": {
+    "schemas": {
+      "Chat": {
+        "type": "object",
+        "properties": {
+          "movieId": { "type": "integer", "example": 550 },
+          "user": { "type": "string", "example": "MovieFan99" },
+          "text": { "type": "string", "example": "Great movie!" },
+          "timestamp": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Review": {
+        "type": "object",
+        "properties": {
+          "movie_title": { "type": "string", "example": "Inception" },
+          "review_date": { "type": "string", "format": "date" },
+          "content": { "type": "string" },
+          "rating": { "type": "integer", "example": 5 }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/": {
+      "get": {
+        "summary": "Check server status",
+        "tags": ["General"],
+        "responses": {
+          "200": {
+            "description": "Server is running",
+            "content": {
+              "text/plain": {
+                "schema": { "type": "string", "example": "Reviews API running on port: 3001" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/reviews/search": {
+      "get": {
+        "summary": "Search reviews by movie title",
+        "tags": ["Reviews"],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "movie_title",
+            "schema": { "type": "string" },
+            "required": true,
+            "description": "The title of the movie to search for"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of reviews found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Review" }
+                }
+              }
+            }
+          },
+          "500": { "description": "Database query failed" }
+        }
+      }
+    },
+    "/api/chat/save": {
+      "post": {
+        "summary": "Save a new chat message",
+        "tags": ["Chat"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Chat" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Chat saved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "string", "example": "Chat Saved" }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Error saving chat" }
+        }
+      }
+    },
+    "/api/chat/history": {
+      "get": {
+        "summary": "Get chat history for a movie",
+        "tags": ["Chat"],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "movieId",
+            "schema": { "type": "integer" },
+            "required": true,
+            "description": "The ID of the movie"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of chat messages",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Chat" }
+                }
+              }
+            }
+          },
+          "500": { "description": "Database error" }
+        }
+      }
+    }
+  }
+}

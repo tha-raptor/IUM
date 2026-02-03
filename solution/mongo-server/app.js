@@ -1,3 +1,5 @@
+const swaggerJsDoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
 const express = require('express');
 const app = express();
 const reviewRoutes = require('./routes/index');
@@ -10,6 +12,9 @@ const port = 3001;
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
+const swaggerDocument = require('./swagger.json');
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 mongoose.connect('mongodb://localhost:27017/TomatoesDB')
     .then(() => {

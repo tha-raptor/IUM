@@ -1,0 +1,213 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Main Gateway API (MovieApp)",
+    "version": "1.0.0",
+    "description": "API Gateway principale. Smista le richieste verso il backend Spring Boot (Film) e il microservizio MongoDB (Recensioni/Chat).",
+    "contact": {
+      "name": "Tuo Nome",
+      "email": "student@university.edu"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Main Node.js Server"
+    }
+  ],
+  "paths": {
+    "/paged": {
+      "get": {
+        "summary": "Ottieni film paginati",
+        "description": "Proxy verso Spring Boot per ottenere una lista paginata di film.",
+        "tags": ["Movies"],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "schema": { "type": "integer", "default": 0 },
+            "description": "Numero della pagina (inizia da 0)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista film recuperata",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "description": "Risposta paginata di Spring" }
+              }
+            }
+          },
+          "500": { "description": "Errore del microservizio Spring Boot" }
+        }
+      }
+    },
+    "/getMovie/{id}": {
+      "get": {
+        "summary": "Dettagli film per ID",
+        "tags": ["Movies"],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": { "type": "integer" },
+            "required": true,
+            "description": "ID numerico del film"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dettagli del film trovati",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Movie" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/search": {
+      "get": {
+        "summary": "Cerca film per titolo",
+        "tags": ["Movies"],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "schema": { "type": "string" },
+            "required": true,
+            "description": "Titolo (o parte del titolo) da cercare"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Risultati ricerca",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Movie" } }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/searchReviews": {
+      "get": {
+        "summary": "Cerca recensioni",
+        "description": "Proxy verso Mongo Server per trovare recensioni di un film specifico.",
+        "tags": ["Reviews"],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "title",
+            "schema": { "type": "string" },
+            "required": true,
+            "description": "Titolo esatto del film"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Recensioni trovate",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Review" } }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/saveChat": {
+      "post": {
+        "summary": "Salva messaggio chat",
+        "tags": ["Chat"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Chat" }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Messaggio salvato con successo" },
+          "500": { "description": "Errore durante il salvataggio" }
+        }
+      }
+    },
+    "/loadChat": {
+      "get": {
+        "summary": "Carica cronologia chat",
+        "tags": ["Chat"],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "movieId",
+            "schema": { "type": "integer" },
+            "required": true,
+            "description": "ID del film per caricare la chat relativa"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cronologia chat recuperata",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Chat" } }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/addReview": {
+      "post": {
+        "summary": "Aggiungi una recensione",
+        "tags": ["Reviews"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Review" }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Recensione creata" }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Movie": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "title": { "type": "string" },
+          "poster": { "type": "string" },
+          "description": { "type": "string" }
+        }
+      },
+      "Chat": {
+        "type": "object",
+        "properties": {
+          "movieId": { "type": "integer" },
+          "user": { "type": "string" },
+          "text": { "type": "string" },
+          "timestamp": { "type": "string" }
+        }
+      },
+      "Review": {
+        "type": "object",
+        "properties": {
+          "movie_title": { "type": "string" },
+          "review_date": { "type": "string" },
+          "content": { "type": "string" },
+          "rating": { "type": "integer" }
+        }
+      }
+    }
+  }
+}

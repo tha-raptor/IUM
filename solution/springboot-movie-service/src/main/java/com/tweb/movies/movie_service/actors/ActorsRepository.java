@@ -16,6 +16,11 @@ import java.util.List;
  */
 @Repository
 public interface ActorsRepository extends JpaRepository<Actor, Integer> {
+
+    // Restituisce tutti gli attori
+    @Query("SELECT new com.tweb.movies.movie_service.actors.dtos.ActorDTO(a.id, a.name, a.role) FROM Actor a")
+    List<ActorDTO> getAllActors();
+
     // Ricerca per nome
     @Query("SELECT a FROM Actor a WHERE LOWER(a.name) LIKE LOWER(CONCAT('%', :name, '%'))")
     List<ActorNameDTO> findByNameContaining(@Param("name") String name);

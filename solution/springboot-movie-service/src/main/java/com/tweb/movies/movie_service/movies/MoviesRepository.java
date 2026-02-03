@@ -20,20 +20,20 @@ import java.util.Optional;
 public interface MoviesRepository extends JpaRepository<Movie, Integer> {
 
 	// Film paginati, ordine per rating
-	@Query("SELECT new com.tweb.movies.movie_service.dtos.MovieTitlePosterRatingDTO(m.id, m.name, m.poster.link, m.rating) " +
+	@Query("SELECT new com.tweb.movies.movie_service.movies.dtos.MovieTitlePosterRatingDTO(m.id, m.name, m.poster.link, m.rating) " +
 			"FROM Movie m " +
 			"WHERE m.rating IS NOT NULL " +
 			"ORDER BY m.rating DESC")
 	Page<MovieTitlePosterRatingDTO> findAllByRatingDesc(Pageable pageable);
 
 	// Film "leggeri", ordine per rating
-	@Query("SELECT new com.tweb.movies.movie_service.dtos.MovieTitlePosterDTO(m.id, m.name, m.poster.link) " +
+	@Query("SELECT new com.tweb.movies.movie_service.movies.dtos.MovieTitlePosterDTO(m.id, m.name, m.poster.link) " +
 			"FROM Movie m " +
 			"ORDER BY m.rating DESC")
 	List<MovieTitlePosterDTO> findAllLight();
 
 	// Film top 10, ordine per rating
-	@Query(value="SELECT new com.tweb.movies.movie_service.dtos.MovieTitlePosterDescDTO(m.id, m.name, m.description, m.rating, m.poster.link) " +
+	@Query(value="SELECT new com.tweb.movies.movie_service.movies.dtos.MovieTitlePosterDescDTO(m.id, m.name, m.description, m.rating, m.poster.link) " +
 			"FROM Movie m " +
 			"JOIN Poster p ON m.id = p.movie.id " +
 			"WHERE m.rating IS NOT NULL AND m.date IS NOT NULL " +
@@ -58,7 +58,7 @@ public interface MoviesRepository extends JpaRepository<Movie, Integer> {
 	List<MovieByNameDTO> findMovieByNameStartingWith(@Param("name") String name);
 
 	// Film per genere, ordine per rating
-	@Query(value = "SELECT new com.tweb.movies.movie_service.dtos.MovieTitlePosterDTO(m.id, m.name, m.poster.link) " +
+	@Query(value = "SELECT new com.tweb.movies.movie_service.movies.dtos.MovieTitlePosterDTO(m.id, m.name, m.poster.link) " +
 			"FROM Movie m " +
 			"JOIN Genre g ON g.movie.id = m.id " +
 			"WHERE g.genre = :genreName AND m.rating IS NOT NULL " +
@@ -67,7 +67,7 @@ public interface MoviesRepository extends JpaRepository<Movie, Integer> {
 	List<MovieTitlePosterDTO> findTop20MoviesByGenre(@Param("genreName") String genreName);
 
 	// Film per etÃ , ordine per rating
-	@Query(value="SELECT DISTINCT new com.tweb.movies.movie_service.dtos.MovieTitlePosterRatingDTO(m.id, m.name, m.poster.link, m.rating) " +
+	@Query(value="SELECT DISTINCT new com.tweb.movies.movie_service.movies.dtos.MovieTitlePosterRatingDTO(m.id, m.name, m.poster.link, m.rating) " +
 			"FROM Movie m " +
 			"JOIN Release r on r.movie.id = m.id " +
 			"Where r.age_min >= :age_min AND m.rating IS NOT NULL " +
@@ -79,7 +79,7 @@ public interface MoviesRepository extends JpaRepository<Movie, Integer> {
 	Optional<Movie> findMovieById(Integer id);
 
 	// Film per lingua, ordine per rating
-	@Query(value="SELECT new com.tweb.movies.movie_service.dtos.MovieTitlePosterDTO(m.id, m.name, m.poster.link) FROM Movie m " +
+	@Query(value="SELECT new com.tweb.movies.movie_service.movies.dtos.MovieTitlePosterDTO(m.id, m.name, m.poster.link) FROM Movie m " +
 			"JOIN Language l ON l.movie.id = m.id " +
 			"WHERE l.type IN ('Primary Language', 'Spoken language') AND l.language=:language AND m.rating IS NOT NULL " +
 			"ORDER BY m.rating DESC, m.date DESC " +
@@ -87,7 +87,7 @@ public interface MoviesRepository extends JpaRepository<Movie, Integer> {
 	List<MovieTitlePosterDTO> findCultLanguage(@Param("language") String language);
 
 	// Film per studio, ordine per rating
-	@Query("SELECT new com.tweb.movies.movie_service.dtos.MovieTitlePosterDTO(m.id, m.name, m.poster.link) " +
+	@Query("SELECT new com.tweb.movies.movie_service.movies.dtos.MovieTitlePosterDTO(m.id, m.name, m.poster.link) " +
 			"FROM Movie m " +
 			"JOIN m.studios s " +
 			"WHERE s.id = :studioId " +

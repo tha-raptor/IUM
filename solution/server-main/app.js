@@ -1,3 +1,5 @@
+const swaggerJsDoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
 const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
@@ -26,6 +28,9 @@ app.use(express.json({limit: '5mb'}));
 app.use(bodyParser.json());
 
 app.use('/', indexRoutes);
+
+const swaggerDocument = require('./swagger.json');
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.use(function (req, res, next) {
     next(createError(404));

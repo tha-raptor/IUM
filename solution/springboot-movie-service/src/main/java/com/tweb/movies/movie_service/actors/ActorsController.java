@@ -45,7 +45,7 @@ public class ActorsController {
      */
     @Operation(summary = "Get all actors", description = "Returns a list of all actors")
     @GetMapping
-    public List<Actor> getAllActors() {
+    public List<ActorDTO> getAllActors() {
         return actorsService.getAllActors();
     }
 

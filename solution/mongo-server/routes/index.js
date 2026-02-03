@@ -59,15 +59,4 @@ router.get('/api/chat/history', async (req, res, next) => {
         res.status(500).json({ error: err.message });
     }
 });
-
-/*router.post('/api/reviews/search', async (req, res) => {
-    try {
-        const newReview = new Review(req.body);
-        await newReview.save();
-        res.status(201).json(newReview);
-    } catch (error) {
-        res.status(400).json({ error: error.message });
-    }
-});*/
-
 module.exports = router;

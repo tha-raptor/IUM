@@ -28,6 +28,8 @@ public class ActorsService {
         this.actorsRepository = actorsRepository;
     }
 
+    public List<ActorDTO> getAllActors() { return actorsRepository.getAllActors(); }
+
     public Optional<Actor> getActorById(Integer id) {
         return actorsRepository.findById(id);
     }
