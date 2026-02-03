@@ -69,4 +69,9 @@ public class MoviesService {
     public Page<MovieTitlePosterRatingDTO> getMoviesPaged(Pageable pageable) {
         return movieRepository.findAllMoviesPaged(pageable);
     }
+
+    //Film di un attore
+    public List<MovieTitlePosterRatingDTO> getMoviesByActorId(Integer actorId) {
+        return movieRepository.findByActorId(actorId);
+    }
 }

@@ -36,6 +36,9 @@ public class Actor {
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
 
+    public String getRole() { return role; }
+    public void setRole(String role) { this.role = role; }
+
     public Movie getMovie() { return movie; }
     public void setMovie(Movie movie) { this.movie = movie; }
 
@@ -44,6 +47,7 @@ public class Actor {
         return "Actor{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
+                ", role='" + role + '\'' +
                 '}';
     }
 }

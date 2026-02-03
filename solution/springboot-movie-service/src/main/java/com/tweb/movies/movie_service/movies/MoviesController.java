@@ -146,4 +146,16 @@ public class MoviesController {
     public List<MovieTitlePosterDTO> getCultMovies(@PathVariable String language) {
         return moviesService.getCultMovies(language);
     }
+
+    /**
+     * Retrieves all movies featuring a specific actor.
+     * @param actorId The unique ID of the actor.
+     * @return A list of movies.
+     */
+    @Operation(summary = "Get Movies by Actor", description = "Returns a list of movies for a specific actor ID")
+    @ApiResponse(responseCode = "200", description = "Movies retrieved successfully")
+    @GetMapping("/actor/{actorId}")
+    public List<MovieTitlePosterRatingDTO> getMoviesByActor(@PathVariable Integer actorId) {
+        return moviesService.getMoviesByActorId(actorId);
+    }
 }

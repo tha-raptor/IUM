@@ -91,7 +91,7 @@ async function loadMoreMovies() {
         if (!response.ok) throw new Error("Fetch failed");
 
         const movies = await response.json();
-
+        console.log(movies);
         if (movies.length === 0) {
             hasMoreMovies = false;
         } else {
@@ -114,11 +114,11 @@ async function searchByGenre(genreName) {
     const bsOffcanvas = bootstrap.Offcanvas.getInstance(sideMenu);
     if (bsOffcanvas) bsOffcanvas.hide();
 
-    document.getElementById('main-content').style.display = 'none';
-    document.querySelector('.hero-header').style.display = 'block';
+    let contentDiv = document.getElementById('main-content');
     const resultsSection = document.getElementById('movie-results-section');
-    resultsSection.style.display = 'block';
+    contentDiv.innerHTML = `<button id="btn_back" class="btn btn-outline-secondary btn-sm mb-4 d-flex justify-content-start" onclick="location.reload()">← Back</button>`;
 
+    contentDiv.innerHTML = `<button id="btn_back" class="btn btn-outline-secondary btn-sm mb-4 d-flex justify-content-start" onclick="location.reload()">← Back</button>`;
     currentGenre = genreName;
     currentPage = 0;
     hasMoreMovies = true;
@@ -128,58 +128,6 @@ async function searchByGenre(genreName) {
     if(sectionTitle) sectionTitle.innerHTML = `Genre: <span class="text-danger">${genreName}</span>`;
 
     loadMoreMovies();
-}
-
-function showSpinner(show) {
-    const spinner = document.getElementById('loading-spinner');
-    if (spinner) {
-        if (show) spinner.classList.remove('d-none');
-        else spinner.classList.add('d-none');
-    }
-}
-
-function toggleCast(btn) {
-    const hiddenCast = document.getElementById('extra-cast');
-    if (hiddenCast) {
-        hiddenCast.classList.toggle('d-none');
-        if (hiddenCast.classList.contains('d-none')) {
-            btn.textContent = "Show All Cast";
-        } else {
-            hiddenCast.style.display = 'contents';
-            btn.textContent = "Show Less";
-        }
-    }
-}
-
-function toggleCrew(btn) {
-    const hiddenCast = document.getElementById('extra-crew');
-    if (hiddenCast) {
-        hiddenCast.classList.toggle('d-none');
-        if (hiddenCast.classList.contains('d-none')) {
-            btn.textContent = "▼";
-        } else {
-            btn.textContent = "▲";
-        }
-    }
-}
-
-function toggleChat() {
-    const chatWindow = document.getElementById('chat-window');
-    const fab = document.getElementById('chat-fab');
-
-    if (chatWindow.classList.contains('d-none')) {
-        chatWindow.classList.remove('d-none');
-        chatWindow.classList.add('d-flex');
-
-        fab.style.transform = "rotate(45deg)";
-        fab.innerHTML = "✕";
-    } else {
-        chatWindow.classList.add('d-none');
-        chatWindow.classList.remove('d-flex');
-
-        fab.style.transform = "rotate(0deg)";
-        fab.innerHTML = "💬";
-    }
 }
 
 function renderMovies(movieList, shouldAppend = false) {
@@ -228,7 +176,7 @@ async function loadMovieDetails(id) {
         if (!movieResponse.ok) throw new Error("Errore nella ricerca dei film");
 
         const movie = await movieResponse.json();
-        console.log("Movie details"+movie);
+        console.log(movie);
         currentMovieId = movie.id;
 
         let reviews = [];
@@ -273,15 +221,25 @@ async function loadMovieDetails(id) {
                                 <h5 class="text-white mb-3 border-start border-4 border-danger ps-2">Cast</h5>
                                 <div class="d-flex flex-wrap gap-2">
                                 ${movie.actors && movie.actors.length > 0
-                                        ? movie.actors.slice(0, 15).map(actor =>
-                                            `<span class="cast-chip">${actor.name}</span>`
-                                        ).join('')
-                                        : '<span class="text-muted fst-italic">No cast info.</span>'}
-                                
+                                    ? movie.actors.slice(0, 15).map(actor =>
+                                        `<span class="cast-chip"
+                                               style="cursor: pointer;"
+                                               onclick="loadMoviesByActor(${actor.id}, '${actor.name.replace(/'/g, "\\'")}')">
+                                            <strong>${actor.name}</strong>
+                                            ${actor.role ? `<span class="opacity-75 small"> as ${actor.role}</span>` : ''}
+                                         </span>`
+                                    ).join('')
+                                    : '<span class="text-muted fst-italic">No cast info.</span>'}
+
                                 <span id="extra-cast" class="d-none" style="display: contents;">
                                     ${movie.actors && movie.actors.length > 15
                                         ? movie.actors.slice(15).map(actor =>
-                                            `<span class="cast-chip animate-fade-in">${actor.name}</span>`
+                                            `<span class="cast-chip animate-fade-in"
+                                                   style="cursor: pointer;"
+                                                   onclick="loadMoviesByActor(${actor.id}, '${actor.name.replace(/'/g, "\\'")}')">
+                                                <strong>${actor.name}</strong>
+                                                ${actor.role ? `<span class="opacity-75 small"> as ${actor.role}</span>` : ''}
+                                            </span>`
                                         ).join('')
                                         : ''}
                                 </span>
@@ -428,6 +386,45 @@ async function loadMovieDetails(id) {
     }
 }
 
+async function loadMoviesByActor(actorId, actorName) {
+    console.log(`Loading movies for actor: ${actorName} (ID: ${actorId})`);
+
+    const contentDiv = document.getElementById('main-content');
+    contentDiv.innerHTML = `<button id="btn_back" class="btn btn-outline-secondary btn-sm mb-4 d-flex justify-content-start" onclick="location.reload()">← Back</button>`;
+
+    const resultsSection = document.getElementById('movie-results-section');
+    resultsSection.style.display = 'block';
+
+    const sectionTitle = resultsSection.querySelector('h4');
+    if (sectionTitle) {
+        sectionTitle.innerHTML = `Movies featuring: <span class="text-danger">${actorName}</span>`;
+    }
+    const grid = document.getElementById('movie-grid');
+    grid.innerHTML = '';
+    showSpinner(true);
+
+    hasMoreMovies = false;
+
+    try {
+        const response = await fetch(`/movies/actor/${actorId}`);
+
+        if (!response.ok) throw new Error("Actor search failed");
+
+        const movies = await response.json();
+
+        if (!movies || movies.length === 0) {
+            grid.innerHTML = '<p class="text-white text-center">No movies found for this actor.</p>';
+        } else {
+            renderMovies(movies, false);
+        }
+    } catch (error) {
+        console.error("Actor fetch error:", error);
+        grid.innerHTML = `<div class="alert alert-danger">Error loading movies for ${actorName}</div>`;
+    } finally {
+        showSpinner(false);
+    }
+};
+
 function sendMessage(movieId) {
     const inputField = document.getElementById('chat-input');
     const userField = document.getElementById('chat-username');
@@ -466,5 +463,57 @@ function displayMessage(data) {
         `;
         chatBox.insertAdjacentHTML('beforeend', messageHTML);
         chatBox.scrollTop = chatBox.scrollHeight;
+    }
+}
+
+function showSpinner(show) {
+    const spinner = document.getElementById('loading-spinner');
+    if (spinner) {
+        if (show) spinner.classList.remove('d-none');
+        else spinner.classList.add('d-none');
+    }
+}
+
+function toggleCast(btn) {
+    const hiddenCast = document.getElementById('extra-cast');
+    if (hiddenCast) {
+        hiddenCast.classList.toggle('d-none');
+        if (hiddenCast.classList.contains('d-none')) {
+            btn.textContent = "Show All Cast";
+        } else {
+            hiddenCast.style.display = 'contents';
+            btn.textContent = "Show Less";
+        }
+    }
+}
+
+function toggleCrew(btn) {
+    const hiddenCast = document.getElementById('extra-crew');
+    if (hiddenCast) {
+        hiddenCast.classList.toggle('d-none');
+        if (hiddenCast.classList.contains('d-none')) {
+            btn.textContent = "▼";
+        } else {
+            btn.textContent = "▲";
+        }
+    }
+}
+
+function toggleChat() {
+    const chatWindow = document.getElementById('chat-window');
+    const fab = document.getElementById('chat-fab');
+
+    if (chatWindow.classList.contains('d-none')) {
+        chatWindow.classList.remove('d-none');
+        chatWindow.classList.add('d-flex');
+
+        fab.style.transform = "rotate(45deg)";
+        fab.innerHTML = "✕";
+    } else {
+        chatWindow.classList.add('d-none');
+        chatWindow.classList.remove('d-flex');
+
+        fab.style.transform = "rotate(0deg)";
+        fab.innerHTML = "💬";
     }
 }

@@ -92,4 +92,12 @@ public interface MoviesRepository extends JpaRepository<Movie, Integer> {
 			"WHERE s.id = :studioId " +
 			"ORDER BY m.rating DESC")
 	List<MovieTitlePosterDTO> findByStudioId(@Param("studioId") Integer studioId);
+
+	// Film per attore, ordine per rating
+	@Query("SELECT new com.tweb.movies.movie_service.movies.dtos.MovieTitlePosterRatingDTO(m.id, m.name, m.poster.link, m.rating) " +
+			"FROM Movie m " +
+			"JOIN m.actors a " +
+			"WHERE a.id = :actorId " +
+			"ORDER BY m.rating DESC")
+	List<MovieTitlePosterRatingDTO> findByActorId(@Param("actorId") Integer actorId);
 }

@@ -59,6 +59,17 @@ router.get('/genre/:name', async (req, res, next) => {
     }
 });
 
+router.get('/movies/actor/:id', async (req, res, next) => {
+    const actorId = req.params.id;
+    try {
+        const response = await axios.get(`${SPRING_BOOT_URL}/movies/actor/${actorId}`);
+
+        res.json(response.data);
+    } catch (error) {
+        handleError(error, next);
+    }
+});
+
 router.get('/search', async (req, res, next) => {
     const title = req.query.q;
 
