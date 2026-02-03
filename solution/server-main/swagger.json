@@ -135,6 +135,63 @@
           "500": { "description": "Errore durante il salvataggio" }
         }
       }
+    },"/genre/{name}": {
+      "get": {
+        "summary": "Cerca film per genere",
+        "description": "Ottieni una lista di film filtrati per genere (es. Action, Comedy).",
+        "tags": ["Movies"],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "schema": { "type": "string" },
+            "required": true,
+            "description": "Il nome del genere (es. 'Horror')"
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "schema": { "type": "integer", "default": 0 },
+            "description": "Numero della pagina"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista film trovata",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Movie" } }
+              }
+            }
+          }
+        }
+      }
+    }   ,
+    "/movies/actor/{id}": {
+      "get": {
+        "summary": "Dettagli Attore",
+        "description": "Ottieni i dettagli di un attore specifico tramite ID.",
+        "tags": ["Movies"],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": { "type": "integer" },
+            "required": true,
+            "description": "ID numerico dell'attore"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dettagli attore recuperati",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "description": "Dati attore (JSON)" }
+              }
+            }
+          }
+        }
+      }
     },
     "/loadChat": {
       "get": {
