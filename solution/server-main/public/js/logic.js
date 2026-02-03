@@ -131,6 +131,8 @@ async function searchByGenre(genreName) {
 }
 
 function renderMovies(movieList, shouldAppend = false) {
+    const result = document.getElementById('movie-results-section');
+    result.style.display = '';
     const grid = document.getElementById('movie-grid');
     if (!shouldAppend) {
         grid.innerHTML = '';
